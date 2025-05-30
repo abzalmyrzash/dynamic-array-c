@@ -6,7 +6,7 @@ void print_int(void* ptr) {
 int main()
 {
 	DynArr dynarr;
-	DynArr_init(&dynarr, sizeof(int));
+	DynArr_init(&dynarr, sizeof(int), 1, DynArrIntFunc);
 	int a = 5;
 	DynArr_append(&dynarr, &a);
 	int b = 6;
