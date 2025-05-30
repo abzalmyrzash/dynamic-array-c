@@ -9,9 +9,9 @@ typedef struct {
 	void* data;
 } DynArr;
 
-void DynArr_init(DynArr *a, int elem_size) {
+void DynArr_init(DynArr *a, int elem_size, int alloc_size) {
 	a->elem_size = elem_size;
-	a->alloc_size = 1;
+	a->alloc_size = alloc_size;
 	a->len = 0;
 	a->data = malloc(a->alloc_size * elem_size);
 }
