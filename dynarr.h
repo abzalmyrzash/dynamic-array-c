@@ -16,6 +16,12 @@ void DynArr_init(DynArr *a, int elem_size, int alloc_size) {
 	a->data = malloc(a->alloc_size * elem_size);
 }
 
+DynArr DynArr_new(int elem_size, int alloc_size) {
+	DynArr a;
+	DynArr_init(&a, elem_size, alloc_size);
+	return a;
+}
+
 void DynArr_grow(DynArr *a, int n) {
 	a->len += n;
 	while (a->len > a->alloc_size) {
@@ -42,19 +48,19 @@ void DynArr_iterate(DynArr *a, void (*f)(void*)) {
 	}
 }
 		
-void DynArr_append(DynArr *a, void* elem) {
+void* DynArr_append(DynArr *a, void* elem) {
 	int prev_len = a->len;
 	DynArr_grow(a, 1);
-	memcpy(DynArr_at(a, prev_len), elem, a->elem_size);
+	return memcpy(DynArr_at(a, prev_len), elem, a->elem_size);
 }
 
-void DynArr_append_arr(DynArr *a, void* arr, int n) {
+void* DynArr_append_arr(DynArr *a, void* arr, int n) {
 	int prev_len = a->len;
 	DynArr_grow(a, n);
-	memcpy(DynArr_at(a, prev_len), arr, n * a->elem_size);
+	return memcpy(DynArr_at(a, prev_len), arr, n * a->elem_size);
 }
 
-void DynArr_insert(DynArr *a, int ind, void* elem) {
+void* DynArr_insert(DynArr *a, int ind, void* elem) {
 	if(ind < 0 || ind > a->len) {
 		printf("Can't insert, index (%d) out of bounds [0, %d]!\n", ind, a->len);
 		exit(1);
@@ -63,10 +69,10 @@ void DynArr_insert(DynArr *a, int ind, void* elem) {
 	DynArr_grow(a, 1);
 	int num_to_move = prev_len - ind;
 	memmove(DynArr_at(a, ind+1), DynArr_at(a, ind), num_to_move * a->elem_size);
-	memcpy(DynArr_at(a, ind), elem, a->elem_size);
+	return memcpy(DynArr_at(a, ind), elem, a->elem_size);
 }
 
-void DynArr_insert_arr(DynArr *a, int ind, void* arr, int n) {
+void* DynArr_insert_arr(DynArr *a, int ind, void* arr, int n) {
 	if(ind < 0 || ind > a->len) {
 		printf("Can't insert, index (%d) out of bounds [0, %d]!\n", ind, a->len);
 		exit(1);
@@ -75,10 +81,10 @@ void DynArr_insert_arr(DynArr *a, int ind, void* arr, int n) {
 	DynArr_grow(a, n);
 	int num_to_move = prev_len - ind;
 	memmove(DynArr_at(a, ind+n), DynArr_at(a, ind), num_to_move * a->elem_size);
-	memcpy(DynArr_at(a, ind), arr, n * a->elem_size);
+	return memcpy(DynArr_at(a, ind), arr, n * a->elem_size);
 }
 
-void DynArr_remove(DynArr *a, int ind) {
+void* DynArr_remove(DynArr *a, int ind) {
 	if(ind < 0 || ind >= a->len) {
 		printf("Can't remove, index (%d) out of bounds [0, %d)!\n", ind, a->len);
 		exit(1);
@@ -86,10 +92,10 @@ void DynArr_remove(DynArr *a, int ind) {
 	int prev_len = a->len;
 	DynArr_shrink(a, 1);
 	int num_to_move = prev_len - ind;
-	memmove(DynArr_at(a, ind), DynArr_at(a, ind+1), num_to_move * a->elem_size);
+	return memmove(DynArr_at(a, ind), DynArr_at(a, ind+1), num_to_move * a->elem_size);
 }
 
-void DynArr_remove_range(DynArr *a, int ind, int n) {
+void* DynArr_remove_range(DynArr *a, int ind, int n) {
 	if(ind < 0 || ind >= a->len) {
 		printf("Can't remove, index (%d) out of bounds [0, %d)!\n", ind, a->len);
 		exit(1);
@@ -102,7 +108,7 @@ void DynArr_remove_range(DynArr *a, int ind, int n) {
 	int prev_len = a->len;
 	DynArr_shrink(a, n);
 	int num_to_move = prev_len - ind;
-	memmove(DynArr_at(a, ind), DynArr_at(a, ind+n), num_to_move * a->elem_size);
+	return memmove(DynArr_at(a, ind), DynArr_at(a, ind+n), num_to_move * a->elem_size);
 }
 
 void* DynArr_pop(DynArr *a) {
@@ -110,7 +116,8 @@ void* DynArr_pop(DynArr *a) {
 	return DynArr_at(a, a->len);
 }
 
-void DynArr_pop_n(DynArr *a, int n) {
+void* DynArr_pop_n(DynArr *a, int n) {
 	DynArr_shrink(a, n);
+	return DynArr_at(a, a->len);
 }
 
