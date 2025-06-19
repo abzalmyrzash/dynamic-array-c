@@ -1,7 +1,4 @@
 #include "dynarr.h"
-void print_int(void* ptr) {
-	printf("%d ", *(int*)ptr);
-}
 
 int main()
 {
@@ -24,9 +21,11 @@ int main()
 	DynArr_print(&dynarr);
 	DynArr_remove_range(&dynarr, 4, 2);
 	DynArr_print(&dynarr);
-	print_int(DynArr_pop(&dynarr));
-	printf("\n");
+	DynArr_pop(&dynarr);
+	DynArr_print(&dynarr);
 	DynArr_pop_n(&dynarr, 2);
+	DynArr_print(&dynarr);
+	DynArr_clear(&dynarr);
 	DynArr_print(&dynarr);
 	return 0;
 }

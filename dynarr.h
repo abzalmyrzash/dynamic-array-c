@@ -107,12 +107,10 @@ void DynArr_free(DynArr* a) {
 }
 
 void _DynArr_free_elem(DynArr* a, size_t index) {
-	if (a->func.free == NULL) return;
 	a->func.free(DynArr_at(a, index));
 }
 
 void _DynArr_free_range(DynArr* a, size_t index, size_t n) {
-	if (a->func.free == NULL) return;
 	DynArr_iterate_range(a, index, n, a->func.free);
 }
 
@@ -172,7 +170,7 @@ void* DynArr_insert_arr(DynArr *a, size_t ind, void* arr, size_t n) {
 void* DynArr_remove(DynArr *a, size_t ind) {
 	_DynArr_check_index(a, ind);
 	size_t prev_len = a->len;
-	_DynArr_free_elem(a, ind);
+	if(a->func.free != NULL) _DynArr_free_elem(a, ind);
 	DynArr_shrink(a, 1);
 	size_t num_to_move = prev_len - ind;
 	return memmove(DynArr_at(a, ind), DynArr_at(a, ind+1), num_to_move * a->elem_size);
@@ -181,20 +179,24 @@ void* DynArr_remove(DynArr *a, size_t ind) {
 void* DynArr_remove_range(DynArr *a, size_t ind, size_t n) {
 	_DynArr_check_range(a, ind, n);
 	size_t prev_len = a->len;
-	_DynArr_free_range(a, ind, n);
+	if(a->func.free != NULL) _DynArr_free_range(a, ind, n);
 	DynArr_shrink(a, n);
 	size_t num_to_move = prev_len - ind;
 	return memmove(DynArr_at(a, ind), DynArr_at(a, ind+n), num_to_move * a->elem_size);
 }
 
-void* DynArr_pop(DynArr *a) {
+void DynArr_pop(DynArr *a) {
 	DynArr_shrink(a, 1);
-	return DynArr_at(a, a->len);
+	if(a->func.free != NULL) _DynArr_free_elem(a, a->len);
 }
 
-void* DynArr_pop_n(DynArr *a, size_t n) {
+void DynArr_pop_n(DynArr *a, size_t n) {
 	DynArr_shrink(a, n);
-	return DynArr_at(a, a->len);
+	if(a->func.free != NULL) _DynArr_free_range(a, a->len, n);
+}
+
+void DynArr_clear(DynArr *a) {
+	DynArr_pop_n(a, a->len);
 }
 
 size_t DynArr_index(DynArr *a, void* ptr) {
