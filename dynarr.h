@@ -48,7 +48,7 @@ void _DynArr_check_index(DynArr *a, size_t index) {
 }
 
 void _DynArr_check_range(DynArr *a, size_t index, size_t n) {
-	if (index < 0 || index + n < a->len) {
+	if (index < 0 || index + n > a->len) {
 		printf("ERROR: Invalid range (i=%d, n=%d) for array (%d)!\n",
 			index, n, a->len);
 		exit(1);
@@ -148,6 +148,7 @@ void* DynArr_append(DynArr *a, void* elem) {
 void* DynArr_append_arr(DynArr *a, void* arr, size_t n) {
 	size_t prev_len = a->len;
 	DynArr_grow(a, n);
+	printf("%d\n", a->len);
 	return DynArr_assign_arr(a, prev_len, arr, n);
 }
 
@@ -161,12 +162,11 @@ void* DynArr_insert(DynArr *a, size_t ind, void* elem) {
 }
 
 void* DynArr_insert_arr(DynArr *a, size_t ind, void* arr, size_t n) {
-	_DynArr_check_range(a, ind, n);
 	size_t prev_len = a->len;
 	DynArr_grow(a, n);
 	size_t num_to_move = prev_len - ind;
 	memmove(DynArr_at(a, ind+n), DynArr_at(a, ind), num_to_move * a->elem_size);
-	return DynArr_assign_arr(a, prev_len, arr, n);
+	return DynArr_assign_arr(a, ind, arr, n);
 }
 
 void* DynArr_remove(DynArr *a, size_t ind) {
