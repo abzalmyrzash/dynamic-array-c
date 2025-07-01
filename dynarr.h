@@ -144,9 +144,12 @@ void* DynArr_append(DynArr *a, void* elem) {
 }
 
 void* DynArr_append_arr(DynArr *a, void* arr, size_t n) {
+	if (n < 0) {
+		printf("ERROR in DynArr_append_arr: negative n!\n");
+		exit(1);
+	}
 	size_t prev_len = a->len;
 	DynArr_grow(a, n);
-	printf("%d\n", a->len);
 	return DynArr_assign_arr(a, prev_len, arr, n);
 }
 
@@ -210,6 +213,12 @@ void DynArr_delete(DynArr *a, void* ptr) {
 		exit(1);
 	}
 	DynArr_remove(a, index);
+}
+
+DynArr* DynArr_copy(DynArr *a) {
+	DynArr* copy = DynArr_new(a->elem_size, a->alloc_size, a->func);
+	DynArr_append_arr(copy, a->data, a->len);
+	return copy;
 }
 
 // DynArr functions for some types
