@@ -99,6 +99,7 @@ void DynArr_print(DynArr* a) {
 }
 
 void DynArr_free(DynArr* a) {
+	if (a == NULL) return;
 	if(a->func.free != NULL) {
 		DynArr_iterate(a, a->func.free);
 	}
