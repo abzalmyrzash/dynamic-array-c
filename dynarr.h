@@ -190,12 +190,12 @@ void* DynArr_remove_range(DynArr *a, size_t ind, size_t n) {
 }
 
 void DynArr_pop(DynArr *a) {
-	if(a->func.free != NULL) _DynArr_free_elem(a, a->len);
+	if(a->func.free != NULL) _DynArr_free_elem(a, a->len - 1);
 	DynArr_shrink(a, 1);
 }
 
 void DynArr_pop_n(DynArr *a, size_t n) {
-	if(a->func.free != NULL) _DynArr_free_range(a, a->len, n);
+	if(a->func.free != NULL) _DynArr_free_range(a, a->len - n, n);
 	DynArr_shrink(a, n);
 }
 
