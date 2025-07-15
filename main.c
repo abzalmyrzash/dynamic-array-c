@@ -8,8 +8,7 @@ int main()
 	int a = 5;
 	DynArr_append(&dynarr, &a);
 	DynArr_print(&dynarr);
-	int b = 6;
-	DynArr_append(&dynarr, &b);
+	*(int*)DynArr_append_empty(&dynarr) = 6;
 	DynArr_print(&dynarr);
 	int arr[] = {-1, 1, 2, 3, 4};
 	DynArr_insert_arr(&dynarr, 0, arr, 5);

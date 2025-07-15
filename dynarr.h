@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <assert.h>
+#include <stdbool.h>
 
 // a struct that holds pointers to functions that operate on an array's elements
 typedef struct {
@@ -40,19 +42,12 @@ DynArr* DynArr_new(size_t elem_size, size_t alloc_size, DynArrFunc func) {
 	return a;
 }
 
-void _DynArr_check_index(DynArr *a, size_t index) {
-	if (index < 0 || index >= a->len) {
-		printf("ERROR: index out of bounds!\n");
-		exit(1);
-	}
+bool _DynArr_check_index(DynArr *a, size_t index) {
+	return (index >= 0 && index < a->len);
 }
 
-void _DynArr_check_range(DynArr *a, size_t index, size_t n) {
-	if (index < 0 || index + n > a->len) {
-		printf("ERROR: Invalid range (i=%d, n=%d) for array (%d)!\n",
-			index, n, a->len);
-		exit(1);
-	}
+bool _DynArr_check_range(DynArr *a, size_t index, size_t n) {
+	return (index >= 0 && index + n <= a->len);
 }
 
 void* DynArr_at(DynArr* a, size_t index) {
@@ -60,7 +55,7 @@ void* DynArr_at(DynArr* a, size_t index) {
 }
 
 void* DynArr_assign(DynArr* a, size_t index, void* data) {
-	_DynArr_check_index(a, index);
+	assert(_DynArr_check_index(a, index));
 	if(a->func.copy != NULL) {
 		data = a->func.copy(data);
 	}
@@ -72,7 +67,7 @@ void* DynArr_assign(DynArr* a, size_t index, void* data) {
 }
 
 void* DynArr_assign_arr(DynArr* a, size_t index, void* arr, size_t n) {
-	_DynArr_check_range(a, index, n);
+	assert(_DynArr_check_range(a, index, n));
 	for(size_t i = 0; i < n; i++) {
 		DynArr_assign(a, index+i, arr + i * a->elem_size);
 	}
@@ -86,7 +81,7 @@ void DynArr_iterate(DynArr *a, void (*f)(void*)) {
 }
 
 void DynArr_iterate_range(DynArr *a, size_t index, size_t n, void (*f)(void*)) {
-	_DynArr_check_range(a, index, n);
+	assert(_DynArr_check_range(a, index, n));
 	for(size_t i = 0; i < n; i++) {
 		(*f)(DynArr_at(a, index+i));
 	}
@@ -149,6 +144,11 @@ void* DynArr_append(DynArr *a, void* elem) {
 	return DynArr_assign(a, prev_len, elem);
 }
 
+void* DynArr_append_empty(DynArr* a) {
+	DynArr_grow(a, 1);
+	return DynArr_at(a, a->len - 1);
+}
+
 void* DynArr_append_arr(DynArr *a, void* arr, size_t n) {
 	if (n < 0) {
 		printf("ERROR in DynArr_append_arr: negative n!\n");
@@ -159,8 +159,13 @@ void* DynArr_append_arr(DynArr *a, void* arr, size_t n) {
 	return DynArr_assign_arr(a, prev_len, arr, n);
 }
 
+void* DynArr_append_arr_empty(DynArr* a, size_t n) {
+	DynArr_grow(a, n);
+	return DynArr_at(a, a->len - n);
+}
+
 void* DynArr_insert(DynArr *a, size_t ind, void* elem) {
-	_DynArr_check_index(a, ind);
+	assert(_DynArr_check_index(a, ind));
 	size_t prev_len = a->len;
 	DynArr_grow(a, 1);
 	size_t num_to_move = prev_len - ind;
@@ -168,7 +173,17 @@ void* DynArr_insert(DynArr *a, size_t ind, void* elem) {
 	return DynArr_assign(a, ind, elem);
 }
 
+void* DynArr_insert_empty(DynArr* a, size_t ind) {
+	assert(_DynArr_check_index(a, ind));
+	size_t prev_len = a->len;
+	DynArr_grow(a, 1);
+	size_t num_to_move = prev_len - ind;
+	memmove(DynArr_at(a, ind+1), DynArr_at(a, ind), num_to_move * a->elem_size);
+	return DynArr_at(a, ind);
+}
+
 void* DynArr_insert_arr(DynArr *a, size_t ind, void* arr, size_t n) {
+	assert(_DynArr_check_index(a, ind));
 	size_t prev_len = a->len;
 	DynArr_grow(a, n);
 	size_t num_to_move = prev_len - ind;
@@ -176,8 +191,17 @@ void* DynArr_insert_arr(DynArr *a, size_t ind, void* arr, size_t n) {
 	return DynArr_assign_arr(a, ind, arr, n);
 }
 
+void* DynArr_insert_arr_empty(DynArr* a, size_t ind, size_t n) {
+	assert(_DynArr_check_index(a, ind));
+	size_t prev_len = a->len;
+	DynArr_grow(a, n);
+	size_t num_to_move = prev_len - ind;
+	memmove(DynArr_at(a, ind+n), DynArr_at(a, ind), num_to_move * a->elem_size);
+	return DynArr_at(a, ind);
+}
+
 void* DynArr_remove(DynArr *a, size_t ind) {
-	_DynArr_check_index(a, ind);
+	assert(_DynArr_check_index(a, ind));
 	size_t prev_len = a->len;
 	if(a->func.free != NULL) _DynArr_free_elem(a, ind);
 	DynArr_shrink(a, 1);
@@ -186,7 +210,7 @@ void* DynArr_remove(DynArr *a, size_t ind) {
 }
 
 void* DynArr_remove_range(DynArr *a, size_t ind, size_t n) {
-	_DynArr_check_range(a, ind, n);
+	assert(_DynArr_check_range(a, ind, n));
 	size_t prev_len = a->len;
 	if(a->func.free != NULL) _DynArr_free_range(a, ind, n);
 	DynArr_shrink(a, n);
