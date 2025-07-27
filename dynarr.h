@@ -36,6 +36,8 @@ void DynArr_print(DynArr* a);
 
 void DynArr_free(DynArr* a);
 
+void DynArr_free_data(DynArr* a);
+
 void* DynArr_append(DynArr *a, void* elem);
 
 void* DynArr_append_empty(DynArr* a);

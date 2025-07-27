@@ -94,7 +94,7 @@ void DynArr_print(DynArr* a) {
 	}
 }
 
-static void DynArr_free_data(DynArr* a) {
+void DynArr_free_data(DynArr* a) {
 	if (a == NULL) return;
 	if(a->func.free != NULL) {
 		DynArr_iterate(a, a->func.free);
