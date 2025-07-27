@@ -72,11 +72,11 @@ DynArr* DynArr_copy(DynArr *a);
 
 // DynArr functions for some types
 
-DynArrFunc DynArrFuncNULL = { NULL, NULL, NULL };
+const DynArrFunc DynArrFuncNULL = { NULL, NULL, NULL };
 
 void DynArrInt_print(void* data, size_t len);
 
-DynArrFunc DynArrIntFunc = { DynArrInt_print, NULL, NULL };
+const DynArrFunc DynArrIntFunc = { DynArrInt_print, NULL, NULL };
 
 void DynArrString_print(void* data, size_t len);
 
@@ -84,5 +84,5 @@ void* DynArrString_copy(void* ptr);
 
 void DynArrString_free(void* ptr);
 
-DynArrFunc DynArrStringFunc = { DynArrString_print, DynArrString_copy, DynArrString_free };
+const DynArrFunc DynArrStringFunc = { DynArrString_print, DynArrString_copy, DynArrString_free };
 
